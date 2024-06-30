@@ -1,13 +1,9 @@
-provider "google" {
-  project = var.project_id
-  region  = var.region
-}
-
 resource "google_bigquery_dataset" "account_dataset" {
   dataset_id = "account"
   location   = var.region
 }
 
+# 这里引用modules的path总是出问题，不行就用resource直接定义也可以
 module "accountid" {
   source     = "../../../modules/bigquery_table"
   dataset_id = google_bigquery_dataset.account_dataset.dataset_id

@@ -29,8 +29,8 @@ jobs:
     - name: 'auth'
       uses: 'google-github-actions/auth@v1'
       with:
-        workload_identity_provider: 'projects/814992956970/locations/global/workloadIdentityPools/zdh-workflow-wi-pool/providers/github'
-        service_account: zdh-workflow-action@bold-seat-291901.iam.gserviceaccount.com
+        workload_identity_provider: 'projects/<project-id>/locations/global/workloadIdentityPools/zdh-workflow-wi-pool/providers/github'
+        service_account: zdh-workflow-action@<project-name>.iam.gserviceaccount.com
 
     - name: 'Set up Cloud SDK'
       uses: 'google-github-actions/setup-gcloud@v1'
@@ -38,20 +38,20 @@ jobs:
     - name: Setup Terraform
       uses: hashicorp/setup-terraform@v2
 
-      - name: List Datasets
-        id: list_datasets
-        run: |
-          ls datasets > datasets_list.txt
-          cat datasets_list.txt
+    - name: List Datasets
+      id: list_datasets
+      run: |
+        ls datasets > datasets_list.txt
+        cat datasets_list.txt
 
-      - name: Deploy Each Dataset
-        run: |
-          while read dataset; do
-            echo "Processing dataset: $dataset"
-            cd datasets/$dataset
-            terraform init
-            terraform fmt -check
-            terraform plan -var-file=../../environments/${{ github.ref == 'refs/heads/main' && 'production.tfvars' || 'development.tfvars' }}
-            terraform apply -var-file=../../environments/${{ github.ref == 'refs/heads/main' && 'production.tfvars' || 'development.tfvars' }} -auto-approve
-            cd ../../
-          done < datasets_list.txt
+    - name: Deploy Each Dataset
+      run: |
+        while read dataset; do
+          echo "Processing dataset: $dataset"
+          cd datasets/$dataset
+          terraform init
+          terraform fmt -check
+          terraform plan -var-file=../../environments/${{ github.ref == 'refs/heads/main' && 'production.tfvars' || 'development.tfvars' }}
+          terraform apply -var-file=../../environments/${{ github.ref == 'refs/heads/main' && 'production.tfvars' || 'development.tfvars' }} -auto-approve
+          cd ../../
+        done < datasets_list.txt

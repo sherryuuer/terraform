@@ -1,0 +1,54 @@
+name: Terraform
+
+defaults:
+  run:
+    working-directory: ./src2/gcp/bigquery
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+      - dev
+    paths:
+      - src2/gcp/bigquery/**
+
+jobs:
+  deploy:
+    name: Deploy BigQuery Datasets
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: 'auth'
+      uses: 'google-github-actions/auth@v1'
+      with:
+        workload_identity_provider: 'projects/<project-id>/locations/global/workloadIdentityPools/zdh-workflow-wi-pool/providers/github'
+        service_account: zdh-workflow-action@<project-name>.iam.gserviceaccount.com
+    
+    - name: 'Set up Cloud SDK'
+      uses: 'google-github-actions/setup-gcloud@v1'
+
+    - name: Setup Terraform
+      uses: hashicorp/setup-terraform@v2
+
+    - name: Deploy Each Dataset
+      run: |
+        echo "Initializing Terraform"
+        terraform init
+    
+        echo "Checking Terraform format"
+        terraform fmt -check
+    
+        echo "Planning Terraform changes"
+        terraform plan -var-file=environments/${{ github.ref == 'refs/heads/main' && 'production.tfvars' || 'development.tfvars' }}
+    
+        echo "Applying Terraform changes"
+        terraform apply -var-file=environments/${{ github.ref == 'refs/heads/main' && 'production.tfvars' || 'development.tfvars' }} -auto-approve
+  

@@ -1,0 +1,33 @@
+name: deploy_to_gcs
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - src/*
+
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - id: 'checkout'
+        uses: 'actions/checkout@v3'
+
+      - id: 'auth'
+        uses: 'google-github-actions/auth@v1'
+        with:
+          workload_identity_provider: 'projects/814992956970/locations/global/workloadIdentityPools/zdh-workflow-wi-pool/providers/github'
+          service_account: zdh-workflow-action@bold-seat-291901.iam.gserviceaccount.com
+
+      - id: 'upload-folder'
+        uses: 'google-github-actions/upload-cloud-storage@v2'
+        with:
+          path: 'src'
+          destination: 'oh-test'
