@@ -1,5 +1,7 @@
 # terraform lab
 
+[Link](https://developer.hashicorp.com/terraform/install)
+
 **install on MAC by binary zip file**
 
 - wget link to download the zip package
@@ -10,5 +12,5 @@
 
 **install on MAC by brew**
 
-- brew tap hashicorp/tap
-- brew install hashicorp/tap/terraform
+- `brew tap hashicorp/tap`
+- `brew install hashicorp/tap/terraform`
