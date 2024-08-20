@@ -8,7 +8,9 @@ terraform {
 }
 
 # Configure the AWS Provider, exported as env configuration
-provider "aws" {}
+provider "aws" {
+  region = "ap-northeast-1"
+}
 
 # resource "<provider>_<resource_type>" "local_name" {
 #   argument1 = value1
